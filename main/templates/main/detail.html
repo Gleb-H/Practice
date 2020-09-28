@@ -1,0 +1,74 @@
+{% extends "layout/basic.html" %}
+
+{% load thumbnail %}
+{% load static %}
+{% load bootstrap4 %}
+
+{% block title %}{{ bb.title }} - {{ bb.rubric.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="row">
+        {% if bb.image %}
+        <div class="col-md-auto"><img src="{{ bb.image.url }}" class="main-image"></div>
+        {% endif %}
+        <div class="col">
+            <h2>{{ bb.title }}</h2>
+            <p>{{ bb.content }}</p>
+            <p class="font-weight-bold">{{ bb.price }} грн.</p>
+            <p>{{ bb.contacts }}</p>
+            <p class="text-right font-italic">Объявление добавлено {{ bb.created_at }}</p>
+        </div>
+    </div>
+</div>
+{% if ais %}
+<div class="d-flex justify-content-between flex-wrap mt-5">
+    {% for ai in ais %}
+    <div>
+        <img class="additional-image" src="{{ ai.image.url }}">
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<p><a href="{% url 'main:by_rubric' pk=bb.rubric.pk %}{{ all }}">Назад</a></p>
+<h4 class="mt-5">Новый комментарий</h4>
+<form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form layout='horizontal' %}
+    {% buttons submit='Добавить' %}{% endbuttons %}
+</form>
+{% if comments %}
+<div class="mt-5">
+    {% for comment in comments %}
+    <div class="my-2 p-2 border">
+        <h5>{{ comment.author }}</h5>
+        <p>{{ comment.content }}</p>
+        <p class="text-right font-italic">{{ comment.created_at }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<h4 class="mt-5">Похожие объявления</h4>
+{% if bbs_similar %}
+<ul class="list-unstyled">
+    {% for bb in bbs_similar %}
+    <li class="media my-5 p-3 border">
+        {% url 'main:detail' rubric_pk=bb.rubric.pk pk=bb.pk as url %}
+        <a href="{{ url }}{{ all }}">
+        {% if bb.image %}
+        <img class="mr-3" src="{% thumbnail bb.image 'default' %}">
+        {% else %}
+        <img class="mr-3" src="{% static 'main/empty.jpg' %}">
+        {% endif %}
+        </a>
+        <div class="media-body">
+          <h3><a href="{{ url }}{{ all }}">{{ bb.title }}</a></h3>
+          <div>{{ bb.content }}</div>
+          <p class="text-right font-weight-bold">{{ bb.price }} грн.</p>
+          <p class="text-right font-italic">{{ bb.created_at }}</p>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

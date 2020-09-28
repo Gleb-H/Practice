@@ -1,0 +1,64 @@
+{% load bootstrap4 %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=l, shrink-to-fit=no">
+        <title>{% block title %}Главная{% endblock %} - Доска объявлений</title>
+        {% bootstrap_css %}
+        <link rel="stylesheet" type="text/css" href="{% static 'main/style.css' %}">
+        {% bootstrap_javascript jquery='slim' %}
+    </head>
+    <body class="container-fluid">
+        <header class="mb-2">
+            <h1 class="display-1 text-center">Объявления</h1>
+        </header>
+        <div class="row">
+            <ul class="col nav justify-content-end border">
+                <li class="nav-item"><a class="nav-link" href= "{% url 'main:register' %}">Регистрация</a></li>
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"
+                    data-toggle="dropdown" href="#"
+                    role="button" aria-haspopup="true"
+                    aria-expanded="false">Профиль</a>
+                    <div class="dropdown-menu  dropdown-menu-right">
+                        <a class="dropdown-item" href="{% url 'main:profile' %}">Moи объявления</a>
+                        <a class="dropdown-item" href="{% url 'main:profile_change' %}">Изменить личные данные</a>
+                        <a class="dropdown-item" href="{% url 'main:password_change' %}">Изменить пароль</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'main:logout' %}">Выйти</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'main:profile_delete' %}">Удалить</a>
+                    </div>
+                </li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'main:login' %}">Bxoд</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="row">
+            <nav class="col-md-auto nav flex-column border">
+                <a class="nav-link root" href="{% url 'main:index' %}">Главная</a>
+                {% for rubric in rubrics %}
+                {% ifchanged rubric.super_rubric.pk %}
+                <span class="nav-link root font-weight-bold">{{ rubric.super_rubric.name }}</span>
+                {% endifchanged %}
+                <a class="nav-link" href="{% url 'main:by_rubric' pk=rubric.pk %}">
+                {{ rubric.name }}</a>
+                {% endfor %}
+                <a class="nav-link root" href="{% url 'main:other' page='about' %}">О сайте</a>
+            </nav>
+            <section class="col border ру-2">
+                {% bootstrap_messages %}
+                {% block content %}
+                {% endblock %}
+            </section>
+        </div>
+        <footer class="mt-3">
+            <p class="text-right font-italic">&copy; Глеб Холодулькин, 2020 г.</p>
+        </footer>
+    </body>
+</html>
